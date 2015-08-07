@@ -5,10 +5,14 @@
 <body ng-app="app">
   <div ng-controller="test">
     <input type="text" ng-model="new">
+
     <button ng-click="add()"> ADD </button> </br>
-    <span ng-repeat="a in test">{{a + ' '}}</span>
-    <div react react-data="test">
+
+    <div ng-repeat="a in test">
+      <span>{{a + ' '}}</span>
     </div>
+
+    <react />
   </div>
   <script type="text/javascript" src="assets/frontend.bundle.js"></script>
 </body>

@@ -7,9 +7,8 @@ module.exports = angular.module('app', [])
     $scope.component = List
     $scope.test = ['React', 'and', 'Angular', 'are', 'friends!']
 
-    $scope.remove = function(){
-      console.log('WORK')
-      $scope.test.splice(0, 1)
+    $scope.remove = function(id){
+      $scope.test.splice($scope.test.indexOf(id), 1)
     }
 
     $scope.add = function(){
@@ -17,22 +16,31 @@ module.exports = angular.module('app', [])
     }
   }).directive('react', function(){
     return{
-      restrict: 'EA',
+      restrict: 'E',
       require: '^ngController',
       link: function(scope, element, attrs){
 
-        var _scope = {}
+        render()
 
-        var t = function() { scope.remove.apply(scope) }
+        function render(){
+          var _scope = {}
 
-        function proxyObject(proxy, src, decorator){
+          decorate(_scope, scope, function(){scope.$apply()})
+
+          scope.$watchCollection('test', function(){
+              React.render(React.createElement(scope.component, {scope: _scope}), element[0])
+            }
+          )
+        }
+
+        function decorate(proxy, src, decorator){
           for(var i in src){
             if(src.hasOwnProperty(i)){
               if(typeof src[i] === 'function'){
                 proxy[i] = (function(cb){
                   return function(){
-                    decorator()
                     cb.apply(src, Array.prototype.slice.call(arguments))
+                    decorator()
                   }
                 })(src[i])
               }else{
@@ -42,17 +50,6 @@ module.exports = angular.module('app', [])
           }
         }
 
-        proxyObject(_scope, scope, function(){scope.$apply()})
-
-        render()
-
-        function render(){
-          setTimeout(function() {
-            _scope.remove()
-          }, 1000)
-          console.log(_scope)
-          // React.render(React.createElement(scope.component, {scope: _scope}), element[0])
-        }
       }
     }
   })
